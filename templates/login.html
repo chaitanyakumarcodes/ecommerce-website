@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ShopEasy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Added Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --text-color: #333;
+            --text-light: #777;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9fafb;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        .logo h1 a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .logo h1 a:hover {
+            color: #2980b9;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .cart-icon:hover {
+            color: var(--primary-color);
+        }
+
+        #cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .login-btn, .register-btn {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .login-btn {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .register-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .login-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .register-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Main content styles - Enhanced for login page */
+        main {
+            min-height: calc(100vh - 200px);
+            padding: 60px 0;
+            background: linear-gradient(to bottom right, #f9fafb, #edf3f7);
+        }
+
+        .auth-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--primary-color);
+        }
+
+        .auth-container h2 {
+            color: var(--dark-color);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .auth-container h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+
+        .alert {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: var(--secondary-color);
+        }
+
+        .alert-danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: var(--danger-color);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: #f9fafb;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            background-color: white;
+        }
+
+        .form-group .input-icon {
+            position: absolute;
+            top: 38px;
+            right: 15px;
+            color: var(--text-light);
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 40px;
+            right: 15px;
+            color: var(--text-light);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 15px;
+        }
+
+        .form-submit:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .form-submit:active {
+            transform: translateY(-1px);
+        }
+
+        .auth-links {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .auth-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        .social-login {
+            margin-top: 30px;
+            position: relative;
+            text-align: center;
+        }
+
+        .social-login::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: #ddd;
+        }
+
+        .social-login span {
+            display: inline-block;
+            padding: 0 15px;
+            background-color: white;
+            position: relative;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: var(--transition);
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .facebook {
+            background-color: #3b5998;
+        }
+
+        .google {
+            background-color: #db4437;
+        }
+
+        .twitter {
+            background-color: #1da1f2;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 60px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .footer-section p {
+            color: #bdc3c7;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+            margin-left: 5px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 30px;
+                margin: 0 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header .container {
+                flex-direction: column;
+                padding: 15px 0;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            nav ul {
+                gap: 10px;
+                margin: 15px 0;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+                padding: 0 15px;
+                margin-top: 15px;
+            }
+
+            .auth-container {
+                padding: 25px;
+            }
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1><a href="/">ShopEasy</a></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/products">Products</a></li>
+                    <li><a href="/categories">Categories</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+                <a href="/login" class="login-btn">Login</a>
+                <a href="/register" class="register-btn">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="auth-container">
+                <h2>Welcome Back</h2>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form action="/login" method="POST">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Your email" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Your password" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="password-icon"></i>
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="checkbox" id="remember" name="remember" style="width: auto; margin-right: 8px;">
+                            <label for="remember" style="margin-bottom: 0; font-size: 0.9rem;">Remember me</label>
+                        </div>
+                        <a href="/forgot-password" style="color: var(--primary-color); font-size: 0.9rem; text-decoration: none;">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="form-submit">Login <i class="fas fa-sign-in-alt" style="margin-left: 5px;"></i></button>
+                </form>
+                
+                <div class="auth-links">
+                    <p>Don't have an account? <a href="/register">Register now</a></p>
+                </div>
+                
+                <div class="social-login">
+                    <span>Or login with</span>
+                </div>
+                
+                <div class="social-buttons">
+                    <a href="/auth/facebook" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="/auth/google" class="social-btn google"><i class="fab fa-google"></i></a>
+                    <a href="/auth/twitter" class="social-btn twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ShopEasy</h3>
+                    <p>Your one-stop shop for all your needs. We provide quality products at affordable prices with excellent customer service.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/categories">Categories</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="/faq">FAQs</a></li>
+                        <li><a href="/shipping">Shipping Policy</a></li>
+                        <li><a href="/returns">Returns & Refunds</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Shopping St, Retail City</p>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> info@shopeasy.com</p>
+                    <p><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShopEasy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Function to toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('password-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        }
+        
+        // Get cart count from API
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/cart')
+                .then(response => response.json())
+                .then(cart => {
+                    document.getElementById('cart-count').textContent = cart.items ? cart.items.length : 0;
+                })
+                .catch(error => console.error('Error fetching cart:', error));
+        });
+    </script>
+</body>
+</html>

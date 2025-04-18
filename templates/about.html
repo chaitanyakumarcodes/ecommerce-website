@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - ShopEasy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Added Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --text-color: #333;
+            --text-light: #777;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9fafb;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        .logo h1 a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .logo h1 a:hover {
+            color: #2980b9;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .cart-icon:hover {
+            color: var(--primary-color);
+        }
+
+        #cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .login-btn, .register-btn {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .login-btn {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .register-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .login-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .register-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* About page specific styles */
+        .about-hero {
+            background: linear-gradient(rgba(44, 62, 80, 0.85), rgba(44, 62, 80, 0.85)), url('/api/placeholder/1200/400') center/cover no-repeat;
+            color: white;
+            text-align: center;
+            padding: 100px 0;
+            margin-bottom: 60px;
+        }
+
+        .about-hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .about-hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.3s forwards;
+            opacity: 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            font-size: 2.2rem;
+            color: var(--dark-color);
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            height: 4px;
+            width: 70px;
+            background-color: var(--primary-color);
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+
+        .about-content {
+            margin-bottom: 60px;
+        }
+
+        .about-story {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+
+        .about-story img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .about-story-text h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+
+        .about-story-text p {
+            margin-bottom: 20px;
+            color: var(--text-light);
+            font-size: 1.05rem;
+        }
+
+        .mission-values {
+            background-color: #fff;
+            padding: 60px 0;
+            margin-bottom: 60px;
+        }
+
+        .mission-values-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .value-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            background-color: white;
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .value-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .value-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .value-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .team-section {
+            margin-bottom: 80px;
+        }
+
+        .team-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .team-member {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+        }
+
+        .team-member img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .team-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .team-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .team-info p {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .team-social {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .team-social a {
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .team-social a:hover {
+            color: var(--primary-color);
+        }
+
+        .stats-section {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 80px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .stat-item p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-bottom: 80px;
+            padding: 60px 0;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: var(--border-radius);
+        }
+
+        .cta-content h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+
+        .cta-content p {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .cta-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 60px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .footer-section p {
+            color: #bdc3c7;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+            margin-left: 5px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .about-story {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-story img {
+                order: -1;
+                max-height: 400px;
+                object-fit: cover;
+            }
+            
+            .mission-values-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                row-gap: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .about-hero p {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header .container {
+                flex-direction: column;
+                padding: 15px 0;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            nav ul {
+                gap: 10px;
+                margin: 15px 0;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+                padding: 0 15px;
+                margin-top: 15px;
+            }
+            
+            .mission-values-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+                row-gap: 30px;
+            }
+            
+            .about-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .about-hero {
+                padding: 70px 0;
+            }
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1><a href="/">ShopEasy</a></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/products">Products</a></li>
+                    <li><a href="/categories">Categories</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+                <a href="/login" class="login-btn">Login</a>
+                <a href="/register" class="register-btn">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="about-hero">
+            <div class="container">
+                <h1>About ShopEasy</h1>
+                <p>Revolutionizing online shopping with quality products, affordable prices, and exceptional customer service since 2020.</p>
+            </div>
+        </section>
+
+        <section class="about-content">
+            <div class="container">
+                <div class="about-story">
+                    <div class="about-story-text">
+                        <h2>Our Story</h2>
+                        <p>ShopEasy was founded in 2020 with a simple yet powerful mission: to make online shopping truly easy. Our founders, all experienced e-commerce professionals, noticed that despite the convenience of online shopping, many consumers were still facing challenges like complicated interfaces, unclear product information, and unreliable customer service.</p>
+                        <p>Starting with just a small team and a handful of products, we've grown into a trusted online marketplace with thousands of products across dozens of categories. Our growth has been fueled by our unwavering commitment to customer satisfaction and our belief that shopping online should be a seamless, enjoyable experience.</p>
+                        <p>Today, ShopEasy is proud to serve customers nationwide, offering a curated selection of high-quality products at competitive prices. We remain dedicated to our founding principles and continue to innovate to make your shopping experience easier every day.</p>
+                    </div>
+                    <img src="/api/placeholder/600/400" alt="ShopEasy Team Working" loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <section class="mission-values">
+            <div class="container">
+                <h2 class="section-title">Our Mission & Values</h2>
+                <div class="mission-values-container">
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3>Quality First</h3>
+                        <p>We meticulously select each product on our platform, ensuring they meet our high standards for quality, durability, and value.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-hand-holding-heart"></i>
+                        </div>
+                        <h3>Customer Focused</h3>
+                        <p>Our customers are at the heart of everything we do. We're committed to providing exceptional service and addressing your needs promptly.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3>Sustainability</h3>
+                        <p>We're committed to reducing our environmental impact through eco-friendly packaging, carbon-neutral shipping options, and sustainable product choices.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Trust & Security</h3>
+                        <p>Your personal and financial information is always protected with the highest security standards and transparent privacy policies.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3>Innovation</h3>
+                        <p>We constantly innovate to improve your shopping experience, from our user-friendly interface to our personalized recommendations.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Community</h3>
+                        <p>We believe in building a community of satisfied customers and giving back through charitable initiatives and support for local causes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <h3>100K+</h3>
+                        <p>Happy Customers</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>15K+</h3>
+                        <p>Products</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>99%</h3>
+                        <p>Customer Satisfaction</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>48h</h3>
+                        <p>Delivery Time</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="team-section">
+            <div class="container">
+                <h2 class="section-title">Meet Our Team</h2>
+                <div class="team-container">
+                    <div class="team-member">
+                        <img src="/api/placeholder/300/300" alt="Sarah Johnson" loading="lazy">
+                        <div class="team-info">
+                            <h3>Sarah Johnson</h3>
+                            <p>Founder & CEO</p>
+                            <div class="team-social">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-twitter"></i></a>
+                                <a href="#"><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <img src="/api/placeholder/300/300" alt="Michael Chen" loading="lazy">
+                        <div class="team-info">
+                            <h3>Michael Chen</h3>
+                            <p>Co-Founder & CTO</p>
+                            <div class="team-social">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-twitter"></i></a>
+                                <a href="#"><i class="fab fa-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <img src="/api/placeholder/300/300" alt="Olivia Rodriguez" loading="lazy">
+                        <div class="team-info">
+                            <h3>Olivia Rodriguez</h3>
+                            <p>Head of Product</p>
+                            <div class="team-social">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-twitter"></i></a>
+                                <a href="#"><i class="fab fa-pinterest"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <img src="/api/placeholder/300/300" alt="James Wilson" loading="lazy">
+                        <div class="team-info">
+                            <h3>James Wilson</h3>
+                            <p>Customer Experience Director</p>
+                            <div class="team-social">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-twitter"></i></a>
+                                <a href="#"><i class="fab fa-instagram"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Start Shopping?</h2>
+                    <p>Join thousands of satisfied customers who have discovered the ShopEasy difference. Create an account today to enjoy personalized recommendations, exclusive deals, and seamless shopping experience.</p>
+                    <a href="/register" class="cta-btn">Create an Account</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ShopEasy</h3>
+                    <p>Your one-stop shop for all your needs. We provide quality products at affordable prices with excellent customer service.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/categories">Categories</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="/faq">FAQs</a></li>
+                        <li><a href="/shipping">Shipping Policy</a></li>
+                        <li><a href="/returns">Returns & Refunds</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Shopping St, Retail City</p>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> info@shopeasy.com</p>
+                    <p><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShopEasy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Get cart count from API
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/cart')
+                .then(response => response.json())
+                .then(cart => {
+                    document.getElementById('cart-count').textContent = cart.items ? cart.items.length : 0;
+                })
+                .catch(error => console.error('Error fetching cart:', error));
+                
+            // Animate stats counting
+            const stats = document.querySelectorAll('.stat-item h3');
+            
+            function animateValue(element, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    let value = Math.floor(progress * (end - start) + start);
+                    
+                    // Format the value appropriately
+                    if (element.textContent.includes('K+')) {
+                        element.textContent = value + 'K+';
+                    } else if (element.textContent.includes('%')) {
+                        element.textContent = value + '%';
+                    } else if (element.textContent.includes('h')) {
+                        element.textContent = value + 'h';
+                    } else {
+                        element.textContent = value;
+                    }
+                    
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+            
+            // Observer for stats section
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Extract number from elements
+                        stats.forEach(stat => {
+                            const value = stat.textContent;
+                            let number;
+                            
+                            if (value.includes('K+')) {
+                                number = parseInt(value.replace('K+', ''));
+                                animateValue(stat, 0, number, 2000);
+                            } else if (value.includes('%')) {
+                                number = parseInt(value.replace('%', ''));
+                                animateValue(stat, 0, number, 2000);
+                            } else if (value.includes('h')) {
+                                number = parseInt(value.replace('h', ''));
+                                animateValue(stat, 0, number, 2000);
+                            } else {
+                                number = parseInt(value);
+                                animateValue(stat, 0, number, 2000);
+                            }
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            // Observe the stats section
+            const statsSection = document.querySelector('.stats-section');
+            observer.observe(statsSection);
+            
+            // Add animation to team members and value cards on scroll
+            const animateOnScroll = function() {
+                // Select items to animate
+                const teamMembers = document.querySelectorAll('.team-member');
+                const valueCards = document.querySelectorAll('.value-card');
+                
+                // Create animation observer
+                const animationObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.animation = 'fadeIn 0.6s ease forwards';
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+                
+                // Apply observers
+                teamMembers.forEach(member => {
+                    member.style.opacity = '0';
+                    animationObserver.observe(member);
+                });
+                
+                valueCards.forEach(card => {
+                    card.style.opacity = '0';
+                    animationObserver.observe(card);
+                });
+            };
+            
+            // Initialize animations
+            animateOnScroll();
+            
+            // Mobile navigation toggle
+            const setupMobileNav = function() {
+                // If we wanted to add a mobile menu toggle button in future
+                // This is where we would add that functionality
+                const mobileBreakpoint = 768;
+                
+                // Function to handle window resize
+                const handleResize = function() {
+                    if (window.innerWidth <= mobileBreakpoint) {
+                        // Mobile view adjustments could go here
+                    } else {
+                        // Desktop view adjustments could go here
+                    }
+                };
+                
+                // Listen for resize events
+                window.addEventListener('resize', handleResize);
+                
+                // Initial call
+                handleResize();
+            };
+            
+            // Initialize mobile navigation
+            setupMobileNav();
+        });
+    </script>
+</body>
+</html>
+

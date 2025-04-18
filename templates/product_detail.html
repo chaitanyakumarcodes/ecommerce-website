@@ -1,0 +1,131 @@
+<!-- templates/product_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - ShopEasy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1><a href="/">ShopEasy</a></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/products">Products</a></li>
+                    <li><a href="/categories">Categories</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+                {% if session.user_id %}
+                    <a href="/profile" class="login-btn">Profile</a>
+                    <a href="/logout" class="register-btn">Logout</a>
+                {% else %}
+                    <a href="/login" class="login-btn">Login</a>
+                    <a href="/register" class="register-btn">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="breadcrumbs">
+                <a href="/">Home</a> > 
+                <a href="/products?category={{ product.category_id }}">{{ product.category.name }}</a> > 
+                {{ product.name }}
+            </div>
+            
+            <div class="product-details">
+                <div class="product-details-img">
+                    <img src="{{ product.image }}" alt="{{ product.name }}">
+                </div>
+                <div class="product-details-info">
+                    <h2>{{ product.name }}</h2>
+                    <div class="product-details-price">${{ "%.2f"|format(product.price) }}</div>
+                    <div class="product-details-desc">
+                        <p>{{ product.description }}</p>
+                    </div>
+                    <div class="product-stock">
+                        {% if product.stock > 0 %}
+                            <span class="in-stock">In Stock ({{ product.stock }})</span>
+                        {% else %}
+                            <span class="out-of-stock">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                    <div class="quantity-selector">
+                        <button data-action="decrease">-</button>
+                        <input type="number" value="1" min="1" max="{{ product.stock }}">
+                        <button data-action="increase">+</button>
+                    </div>
+                    <button class="add-to-cart" data-id="{{ product.id }}">Add to Cart</button>
+                </div>
+            </div>
+            
+            <section class="related-products">
+                <h2 class="section-title">Related Products</h2>
+                <div class="products-grid">
+                    {% for related_product in related_products %}
+                        <div class="product-card">
+                            <div class="product-img">
+                                <img src="{{ related_product.image }}" alt="{{ related_product.name }}">
+                            </div>
+                            <div class="product-info">
+                                <h3><a href="/product/{{ related_product.id }}">{{ related_product.name }}</a></h3>
+                                <div class="product-price">${{ "%.2f"|format(related_product.price) }}</div>
+                                <button class="add-to-cart" data-id="{{ related_product.id }}">Add to Cart</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ShopEasy</h3>
+                    <p>Your one-stop shop for all your needs.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>Email: info@shopeasy.com</p>
+                    <p>Phone: +1 (555) 123-4567</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShopEasy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

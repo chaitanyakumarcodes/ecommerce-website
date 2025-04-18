@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - ShopEasy</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --text-color: #333;
+            --text-light: #777;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9fafb;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .cart-icon:hover {
+            color: var(--primary-color);
+        }
+
+        #cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .login-btn, .register-btn {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .login-btn {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .register-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .login-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .register-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Page header */
+        .page-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/api/placeholder/1200/300');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .breadcrumb a {
+            color: var(--light-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb a:hover {
+            color: white;
+        }
+
+        .breadcrumb .separator {
+            color: var(--light-color);
+        }
+
+        .breadcrumb .current {
+            color: var(--primary-color);
+        }
+
+        /* Categories styles */
+        .categories-section {
+            padding: 0 0 60px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .category-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .category-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .category-card:hover .category-image img {
+            transform: scale(1.1);
+        }
+
+        .category-content {
+            padding: 25px;
+        }
+
+        .category-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .category-content p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .product-count {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .primary-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .secondary-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+
+        .secondary-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Filter section */
+        .filter-section {
+            background-color: var(--light-color);
+            padding: 30px 0;
+            margin-bottom: 40px;
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            padding-right: 40px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .filter-options {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .sort-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        /* No categories message */
+        .no-categories {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .no-categories i {
+            font-size: 3rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .no-categories h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .no-categories p {
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        /* Newsletter section */
+        .newsletter {
+            padding: 80px 0;
+            text-align: center;
+            background-color: #edf3f7;
+        }
+
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .newsletter h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .newsletter p {
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .newsletter-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .newsletter-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 60px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .footer-section p {
+            color: #bdc3c7;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+            margin-left: 5px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 15px;
+            }
+
+            .filter-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-input {
+                border-radius: var(--border-radius);
+                margin-bottom: 10px;
+            }
+
+            .newsletter-btn {
+                border-radius: var(--border-radius);
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header .container {
+                flex-direction: column;
+                padding: 15px 0;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            nav ul {
+                gap: 10px;
+                margin: 15px 0;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+                padding: 0 15px;
+                margin-top: 15px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Apply animations to elements */
+        .category-card {
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: calc(var(--animation-order) * 0.1s);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ShopEasy</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/products">Products</a></li>
+                    <li><a href="/categories">Categories</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+                <a href="/login" class="login-btn">Login</a>
+                <a href="/register" class="register-btn">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Shop by Categories</h1>
+            <div class="breadcrumb">
+                <a href="/">Home</a>
+                <span class="separator">/</span>
+                <span class="current">Categories</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-container">
+                <div class="search-box">
+                    <input type="text" id="category-search" placeholder="Search categories">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="filter-options">
+                    <span class="filter-label">Sort by:</span>
+                    <select id="sort-select" class="sort-select">
+                        <option value="name_asc">Name (A-Z)</option>
+                        <option value="name_desc">Name (Z-A)</option>
+                        <option value="products_count">Number of Products</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories-section">
+        <div class="container">
+            <div class="categories-grid" id="categories-grid">
+                <!-- Categories will be loaded dynamically by JS -->
+                <!-- Loading indicator shown until categories are loaded -->
+                <div id="loading-indicator" style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color);"></i>
+                    <p style="margin-top: 15px;">Loading categories...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Subscribe to Our Newsletter</h2>
+                <p>Stay updated with our latest products and exclusive offers</p>
+                <form class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ShopEasy</h3>
+                    <p>Your one-stop shop for all your needs. We provide quality products at affordable prices with excellent customer service.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/categories">Categories</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="/faq">FAQs</a></li>
+                        <li><a href="/shipping">Shipping Policy</a></li>
+                        <li><a href="/returns">Returns & Refunds</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Shopping St, Retail City</p>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> info@shopeasy.com</p>
+                    <p><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShopEasy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch all categories
+            fetchCategories();
+            
+            // Get cart count
+            fetch('/api/cart')
+                .then(response => response.json())
+                .then(cart => {
+                    updateCartCount(cart.items.length);
+                })
+                .catch(error => console.error('Error fetching cart:', error));
+            
+            // Add event listeners
+            document.getElementById('category-search').addEventListener('input', filterCategories);
+            document.getElementById('sort-select').addEventListener('change', sortCategories);
+        });
+        
+        // Global categories array to store all categories
+        let allCategories = [];
+        
+        // Function to fetch categories from API
+        function fetchCategories() {
+            fetch('/api/categories')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(categories => {
+                    // Store categories in global array
+                    allCategories = categories;
+                    
+                    // Remove loading indicator
+                    document.getElementById('loading-indicator').remove();
+                    
+                    // Display categories
+                    displayCategories(categories);
+                })
+                .catch(error => {
+                    console.error('Error fetching categories:', error);
+                    // Show error message
+                    document.getElementById('loading-indicator').innerHTML = `
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; color: var(--danger-color);"></i>
+                        <p style="margin-top: 15px;">Error loading categories. Please try again later.</p>
+                    `;
+                });
+        }
+        
+        // Function to display categories
+        function displayCategories(categories) {
+            const categoriesGrid = document.getElementById('categories-grid');
+            
+            // Clear current categories
+            categoriesGrid.innerHTML = '';
+            
+            if (categories.length === 0) {
+                // Show no categories message
+                categoriesGrid.innerHTML = `
+                    <div class="no-categories" style="grid-column: 1 / -1;">
+                        <i class="fas fa-box-open"></i>
+                        <h3>No Categories Found</h3>
+                        <p>We couldn't find any categories matching your search.</p>
+                        <button onclick="resetFilters()" class="btn secondary-btn">Reset Filters</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Add categories to grid with animation delay
+            categories.forEach((category, index) => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.style.setProperty('--animation-order', index);
+                
+                card.innerHTML = `
+                    <div class="category-image">
+                        <img src="${category.image || '/api/placeholder/400/220'}" alt="${category.name}">
+                    </div>
+                    <div class="category-content">
+                        <h3>${category.name}</h3>
+                        <p>${category.description}</p>
+                        <div class="product-count">
+                            <i class="fas fa-tag"></i> ${getRandomProductCount()} Products
+                        </div>
+                        <a href="/products?category=${category.id}" class="btn secondary-btn">View Products</a>
+                    </div>
+                `;
+                
+                categoriesGrid.appendChild(card);
+            });
+        }
+        
+        // Helper function to generate random product counts
+        // In a real app, this would come from the API
+        function getRandomProductCount() {
+            return Math.floor(Math.random() * 50) + 5;
+        }
+        
+        // Function to filter categories based on search input
+        function filterCategories() {
+            const searchTerm = document.getElementById('category-search').value.toLowerCase();
+            
+            const filteredCategories = allCategories.filter(category => 
+                category.name.toLowerCase().includes(searchTerm) || 
+                (category.description && category.description.toLowerCase().includes(searchTerm))
+            );
+            
+            // Sort the filtered categories based on current sort selection
+            const sortedCategories = sortCategoriesArray(filteredCategories);
+            
+            // Display the filtered and sorted categories
+            displayCategories(sortedCategories);
+        }
+        
+        // Function to sort categories
+        function sortCategories() {
+            const sortOption = document.getElementById('sort-select').value;
+            const sortedCategories = sortCategoriesArray([...allCategories]);
+            displayCategories(sortedCategories);
+        }
+        
+        // Function to sort the categories array based on sort option
+        function sortCategoriesArray(categoriesArray) {
+            const sortOption = document.getElementById('sort-select').value;
+            
+            switch (sortOption) {
+                case 'name_asc':
+                    return categoriesArray.sort((a, b) => a.name.localeCompare(b.name));
+                case 'name_desc':
+                    return categoriesArray.sort((a, b) => b.name.localeCompare(a.name));
+                case 'products_count':
+                    // In a real app, this would sort by actual product counts
+                    // For now, we'll just randomize the order as a placeholder
+                    return categoriesArray.sort(() => Math.random() - 0.5);
+                default:
+                    return categoriesArray;
+            }
+        }
+        
+        // Function to reset filters
+        function resetFilters() {
+            document.getElementById('category-search').value = '';
+            document.getElementById('sort-select').value = 'name_asc';
+            displayCategories(allCategories);
+        }
+        
+        // Function to update cart count
+        function updateCartCount(count) {
+            document.getElementById('cart-count').textContent = count;
+        }
+    </script>
+</body>
+</html>
