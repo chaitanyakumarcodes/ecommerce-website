@@ -1,7 +1,3 @@
-Certainly! Here's a comprehensive README for the [ecommerce-website](https://github.com/chaitanyakumarcodes/ecommerce-website) GitHub repository by [chaitanyakumarcodes](https://github.com/chaitanyakumarcodes):
-
----
-
 # 🛒 E-Commerce Website
 
 A minimalistic e-commerce web application built with Python and Flask, featuring HTML, CSS, and JavaScript for the frontend. This project serves as a foundational template for developing more complex online shopping platforms.
