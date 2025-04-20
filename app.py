@@ -24,7 +24,13 @@ with app.app_context():
 # Home page
 @app.route('/')
 def index():
-    return render_template('index.html')
+    user = None
+    if 'user_id' in session:
+        user = {
+            'id': session['user_id'],
+            'name': session['user_name']
+        }
+    return render_template('index.html', user=user)
 
 # About page
 @app.route('/about')
@@ -35,6 +41,31 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
+# FAQ page
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
+
+# Shipping Policy page
+@app.route('/shipping')
+def shipping_policy():
+    return render_template('policies.html')
+
+# Privacy Policy page
+@app.route('/privacy')
+def privacy_policy():
+    return render_template('policies.html')
+
+# Return Policy page
+@app.route('/returns')
+def return_policy():
+    return render_template('policies.html')
+
+# Terms and Conditions page
+@app.route('/terms')
+def terms_conditions():
+    return render_template('policies.html')
 
 # Products page
 @app.route('/products')
@@ -176,12 +207,33 @@ def logout():
     flash('You have been logged out successfully', 'success')
     return redirect(url_for('index'))
 
-# Checkout page
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'user_id' not in session and 'cart' not in session:
         flash('Your cart is empty', 'error')
         return redirect(url_for('cart'))
+    
+    # Calculate order totals and get cart items (moved this outside POST to be used for both GET and POST)
+    cart_items = []
+    subtotal = 0
+    
+    if 'user_id' in session:
+        user_cart = Cart.query.filter_by(user_id=session['user_id']).first()
+        if user_cart:
+            cart_items = CartItem.query.filter_by(cart_id=user_cart.id).all()
+            for item in cart_items:
+                subtotal += item.product.price * item.quantity
+    elif 'cart' in session:
+        for item_id, item_data in session['cart'].items():
+            product = Product.query.get(item_data['product_id'])
+            if product:
+                cart_item = type('CartItem', (), {'product': product, 'quantity': item_data['quantity']})
+                cart_items.append(cart_item)
+                subtotal += product.price * item_data['quantity']
+    
+    shipping = 10.00 if subtotal > 0 else 0
+    tax = round(subtotal * 0.1, 2)
+    total = subtotal + shipping + tax
     
     if request.method == 'POST':
         # Process checkout
@@ -191,30 +243,6 @@ def checkout():
         shipping_state = request.form.get('shipping_state')
         shipping_zipcode = request.form.get('shipping_zipcode')
         payment_method = request.form.get('payment_method')
-        
-        # Calculate order totals
-        cart_items = []
-        subtotal = 0
-        
-        if 'user_id' in session:
-            user_cart = Cart.query.filter_by(user_id=session['user_id']).first()
-            if user_cart:
-                cart_items = CartItem.query.filter_by(cart_id=user_cart.id).all()
-                for item in cart_items:
-                    subtotal += item.product.price * item.quantity
-        elif 'cart' in session:
-            for item_id, item_data in session['cart'].items():
-                product = Product.query.get(item_data['product_id'])
-                if product:
-                    cart_items.append({
-                        'product': product,
-                        'quantity': item_data['quantity']
-                    })
-                    subtotal += product.price * item_data['quantity']
-        
-        shipping = 10.00 if subtotal > 0 else 0
-        tax = round(subtotal * 0.1, 2)
-        total = subtotal + shipping + tax
         
         # Create order
         new_order = Order(
@@ -242,9 +270,9 @@ def checkout():
             else:
                 new_order_item = OrderItem(
                     order_id=new_order.id,
-                    product_id=item['product'].id,
-                    quantity=item['quantity'],
-                    price=item['product'].price
+                    product_id=item.product.id,
+                    quantity=item.quantity,
+                    price=item.product.price
                 )
             
             db.session.add(new_order_item)
@@ -253,22 +281,42 @@ def checkout():
         if 'user_id' in session:
             CartItem.query.filter_by(cart_id=user_cart.id).delete()
         else:
-            session.pop('cart')
+            session.pop('cart', None)
         
         db.session.commit()
         
         # Redirect to order confirmation
         return redirect(url_for('order_confirmation', order_id=new_order.id))
     
-    return render_template('checkout.html')
+    # Pass all necessary variables to the template
+    return render_template('checkout.html', 
+                          cart_items=cart_items, 
+                          subtotal=subtotal,
+                          shipping=shipping,
+                          tax=tax,
+                          total=total)
 
 # Order confirmation page
-@app.route('/order-confirmation/<int:order_id>')
+@app.route('/order_confirmation/<int:order_id>')
 def order_confirmation(order_id):
+    # Get the order
     order = Order.query.get_or_404(order_id)
-    order_items = OrderItem.query.filter_by(order_id=order.id).all()
     
-    return render_template('order_confirmation.html', order=order, order_items=order_items)
+    # Security check - only allow the user who placed the order to see the confirmation
+    if 'user_id' in session and order.user_id and order.user_id != session['user_id']:
+        flash('You do not have permission to view this order', 'danger')
+        return redirect(url_for('profile'))
+    
+    # Get order items
+    order_items = OrderItem.query.filter_by(order_id=order_id).all()
+    
+    # For each order item, fetch the associated product
+    for item in order_items:
+        item.product = Product.query.get(item.product_id)
+    
+    return render_template('order_confirmation.html', 
+                          order=order,
+                          order_items=order_items)
 
 # User profile page
 @app.route('/profile')

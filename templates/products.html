@@ -916,6 +916,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    addToCart(productId);
+                });
+            });
+
             // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const categoryParam = urlParams.get('category');
@@ -1226,28 +1233,50 @@
         
         // Add to cart
         function addToCart(productId) {
-            fetch('/api/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    product_id: productId,
-                    quantity: 1
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Update cart count
-                updateCartCount(data.items.length);
-                
-                // Show success message
-                showNotification('Product added to cart successfully!', 'success');
-            })
-            .catch(error => {
-                console.error('Error adding to cart:', error);
-                showNotification('Failed to add product to cart.', 'error');
-            });
+            // Try multiple possible endpoints
+            const endpoints = [
+                '/api/cart/add',
+                '/cart/add',
+                '/add-to-cart',
+                '/api/add-to-cart'
+            ];
+
+            // Try each endpoint until one works
+            const tryEndpoint = (index) => {
+                if (index >= endpoints.length) {
+                    showNotification('Could not find cart service', 'error');
+                    return;
+                }
+
+                fetch(endpoints[index], {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        product_id: productId,
+                        quantity: 1
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Endpoint not found');
+                    return response.json();
+                })
+                .then(data => {
+                    updateCartCount(data.items.length);
+                    showNotification('Product added to cart!', 'success');
+                })
+                .catch(error => {
+                    console.log(`Tried ${endpoints[index]}, failed:`, error);
+                    tryEndpoint(index + 1); // Try next endpoint
+                });
+            };
+
+            tryEndpoint(0); // Start with first endpoint
+        }
+
+        function updateCartCount(count) {
+            document.getElementById('cart-count').textContent = count;
         }
         
         // Toggle wishlist

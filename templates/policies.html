@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopEasy - Policies</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --text-color: #333;
+            --text-light: #777;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9fafb;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 8px 0;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .cart-icon:hover {
+            color: var(--primary-color);
+        }
+
+        #cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .login-btn, .register-btn {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .login-btn {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .register-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .login-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .register-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('static/images/policies-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb li {
+            margin: 0 5px;
+        }
+
+        .breadcrumb li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .breadcrumb li:not(:last-child)::after {
+            content: '/';
+            margin-left: 10px;
+            color: white;
+        }
+
+        /* Policies Content */
+        .policies-container {
+            padding: 60px 0;
+        }
+
+        .policy-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .policy-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .policy-section h3 {
+            margin: 25px 0 15px;
+            color: var(--dark-color);
+        }
+
+        .policy-section p {
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+
+        .policy-section ul {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+
+        .policy-section ul li {
+            margin-bottom: 10px;
+            color: var(--text-light);
+        }
+
+        .policy-nav {
+            position: sticky;
+            top: 100px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .policy-nav h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .policy-nav ul {
+            list-style: none;
+        }
+
+        .policy-nav ul li {
+            margin-bottom: 10px;
+        }
+
+        .policy-nav ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: var(--transition);
+            display: block;
+            padding: 8px 0;
+        }
+
+        .policy-nav ul li a:hover {
+            color: var(--primary-color);
+            padding-left: 5px;
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 60px 0 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .footer-section p {
+            color: #bdc3c7;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+            margin-left: 5px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .policy-content {
+                flex-direction: column;
+            }
+            
+            .policy-nav {
+                position: static;
+                margin-bottom: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 15px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header .container {
+                flex-direction: column;
+                padding: 15px 0;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            nav ul {
+                gap: 10px;
+                margin: 15px 0;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+                padding: 0 15px;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ShopEasy</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/products">Products</a></li>
+                    <li><a href="/categories">Categories</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+                <a href="/login" class="login-btn">Login</a>
+                <a href="/register" class="register-btn">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Our Policies</h1>
+            <ul class="breadcrumb">
+                <li><a href="/">Home</a></li>
+                <li>Policies</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="policies-container">
+        <div class="container">
+            <div class="policy-content" style="display: flex; gap: 30px;">
+                <div class="policy-nav">
+                    <h3>Quick Navigation</h3>
+                    <ul>
+                        <li><a href="#shipping">Shipping Policy</a></li>
+                        <li><a href="#returns">Returns & Refund Policy</a></li>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+
+                <div class="policy-sections" style="flex: 1;">
+                    <!-- Shipping Policy -->
+                    <div class="policy-section" id="shipping">
+                        <h2>Shipping Policy</h2>
+                        <p>At ShopEasy, we strive to deliver your orders in the fastest and safest way possible. Please review our shipping policy below:</p>
+                        
+                        <h3>Shipping Methods & Costs</h3>
+                        <p>We offer several shipping options to meet your needs:</p>
+                        <ul>
+                            <li><strong>Standard Shipping:</strong> 3-5 business days - $5.99</li>
+                            <li><strong>Expedited Shipping:</strong> 2-3 business days - $12.99</li>
+                            <li><strong>Overnight Shipping:</strong> Next business day - $24.99 (order by 12 PM EST)</li>
+                            <li><strong>Free Shipping:</strong> On all orders over $50 (standard shipping only)</li>
+                        </ul>
+                        
+                        <h3>Processing Time</h3>
+                        <p>All orders are processed within 1-2 business days (excluding weekends and holidays) after receiving your order confirmation email. You will receive another notification when your order has shipped.</p>
+                        
+                        <h3>International Shipping</h3>
+                        <p>We currently ship to the following countries: United States, Canada, United Kingdom, Australia, and most European Union countries. International orders may be subject to customs fees, import duties, and taxes which are the responsibility of the customer.</p>
+                        
+                        <h3>Order Tracking</h3>
+                        <p>Once your order has shipped, you will receive a tracking number via email. You can track your order using our website or the carrier's website.</p>
+                        
+                        <h3>Shipping Restrictions</h3>
+                        <p>Some products may have shipping restrictions due to size, weight, or content regulations. These restrictions will be noted on the product page.</p>
+                        
+                        <h3>Undeliverable Packages</h3>
+                        <p>If a package is returned to us as undeliverable, we will contact you to arrange reshipment. Additional shipping fees may apply.</p>
+                    </div>
+
+                    <!-- Returns & Refund Policy -->
+                    <div class="policy-section" id="returns">
+                        <h2>Returns & Refund Policy</h2>
+                        <p>We want you to be completely satisfied with your purchase. If you're not happy with your order, we're here to help.</p>
+                        
+                        <h3>Return Eligibility</h3>
+                        <ul>
+                            <li>Items must be returned within 30 days of the delivery date</li>
+                            <li>Items must be unused, in the original packaging, and in the same condition as received</li>
+                            <li>Proof of purchase is required</li>
+                            <li>Some items are non-returnable (e.g., perishable goods, personalized items)</li>
+                        </ul>
+                        
+                        <h3>Return Process</h3>
+                        <ol>
+                            <li>Contact our customer service team to initiate a return</li>
+                            <li>You will receive a Return Merchandise Authorization (RMA) number</li>
+                            <li>Package the item securely with the RMA number visible</li>
+                            <li>Ship the item back to us using a trackable shipping service</li>
+                        </ol>
+                        
+                        <h3>Refunds</h3>
+                        <p>Once your return is received and inspected, we will notify you of the approval or rejection of your refund. If approved:</p>
+                        <ul>
+                            <li>Refunds will be processed to the original payment method within 5-10 business days</li>
+                            <li>Shipping costs are non-refundable</li>
+                            <li>You will be responsible for return shipping costs unless the return is due to our error</li>
+                        </ul>
+                        
+                        <h3>Exchanges</h3>
+                        <p>We only replace items if they are defective or damaged. If you need to exchange an item, please contact our customer service team.</p>
+                        
+                        <h3>Damaged or Defective Items</h3>
+                        <p>If you receive a damaged or defective item, please contact us immediately with photos of the damage. We will arrange for a replacement or refund at no additional cost to you.</p>
+                    </div>
+
+                    <!-- Privacy Policy -->
+                    <div class="policy-section" id="privacy">
+                        <h2>Privacy Policy</h2>
+                        <p>Last updated: January 1, 2025</p>
+                        <p>ShopEasy ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
+                        
+                        <h3>Information We Collect</h3>
+                        <p>We may collect personal information that you voluntarily provide to us, including:</p>
+                        <ul>
+                            <li>Name, email address, phone number, shipping/billing address</li>
+                            <li>Payment information (processed securely by our payment processor)</li>
+                            <li>Account credentials</li>
+                            <li>Purchase history and preferences</li>
+                        </ul>
+                        <p>We also automatically collect certain information when you visit our website, including:</p>
+                        <ul>
+                            <li>IP address, browser type, operating system</li>
+                            <li>Pages viewed, time spent on site, referring website</li>
+                            <li>Cookies and similar tracking technologies</li>
+                        </ul>
+                        
+                        <h3>How We Use Your Information</h3>
+                        <p>We may use the information we collect for various purposes, including to:</p>
+                        <ul>
+                            <li>Process and fulfill your orders</li>
+                            <li>Communicate with you about your account or orders</li>
+                            <li>Improve our website and services</li>
+                            <li>Personalize your shopping experience</li>
+                            <li>Send marketing communications (you may opt-out at any time)</li>
+                            <li>Prevent fraud and enhance security</li>
+                            <li>Comply with legal obligations</li>
+                        </ul>
+                        
+                        <h3>Sharing Your Information</h3>
+                        <p>We may share your information with:</p>
+                        <ul>
+                            <li>Service providers who assist with our business operations (e.g., shipping, payment processing)</li>
+                            <li>Legal authorities when required by law</li>
+                            <li>Business partners in connection with a merger or acquisition</li>
+                        </ul>
+                        <p>We do not sell your personal information to third parties.</p>
+                        
+                        <h3>Data Security</h3>
+                        <p>We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.</p>
+                        
+                        <h3>Your Rights</h3>
+                        <p>Depending on your location, you may have certain rights regarding your personal information, including:</p>
+                        <ul>
+                            <li>Access, correct, or delete your information</li>
+                            <li>Opt-out of marketing communications</li>
+                            <li>Restrict or object to processing</li>
+                            <li>Data portability</li>
+                        </ul>
+                        <p>To exercise these rights, please contact us using the information below.</p>
+                        
+                        <h3>Cookies</h3>
+                        <p>We use cookies and similar technologies to enhance your experience. You can set your browser to refuse cookies, but some features of our site may not function properly.</p>
+                        
+                        <h3>Children's Privacy</h3>
+                        <p>Our website is not intended for children under 13. We do not knowingly collect personal information from children under 13.</p>
+                        
+                        <h3>Changes to This Policy</h3>
+                        <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page.</p>
+                        
+                        <h3>Contact Us</h3>
+                        <p>If you have questions about this Privacy Policy, please contact us at privacy@shopeasy.com.</p>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="policy-section" id="terms">
+                        <h2>Terms and Conditions</h2>
+                        <p>Last updated: January 1, 2025</p>
+                        <p>These Terms and Conditions ("Terms") govern your use of the ShopEasy website and services. By accessing or using our website, you agree to be bound by these Terms.</p>
+                        
+                        <h3>Eligibility</h3>
+                        <p>You must be at least 18 years old or the age of majority in your jurisdiction to use our services. By using our website, you represent that you meet these requirements.</p>
+                        
+                        <h3>Account Registration</h3>
+                        <p>To access certain features, you may need to create an account. You agree to:</p>
+                        <ul>
+                            <li>Provide accurate and complete information</li>
+                            <li>Maintain the security of your account credentials</li>
+                            <li>Be responsible for all activities under your account</li>
+                            <li>Notify us immediately of any unauthorized use</li>
+                        </ul>
+                        
+                        <h3>Products and Pricing</h3>
+                        <p>We strive for accuracy in product descriptions and pricing. However, we do not warrant that descriptions, prices, or other content are accurate, complete, or current.</p>
+                        <ul>
+                            <li>Prices are subject to change without notice</li>
+                            <li>We reserve the right to limit quantities</li>
+                            <li>We may refuse or cancel any order at our discretion</li>
+                        </ul>
+                        
+                        <h3>Payment</h3>
+                        <p>We accept various payment methods as indicated at checkout. You represent that you have the legal right to use any payment method you provide.</p>
+                        
+                        <h3>Intellectual Property</h3>
+                        <p>All content on our website, including text, graphics, logos, and software, is our property or our licensors' and is protected by intellectual property laws.</p>
+                        
+                        <h3>User Conduct</h3>
+                        <p>You agree not to:</p>
+                        <ul>
+                            <li>Use our website for any illegal purpose</li>
+                            <li>Violate any laws in your jurisdiction</li>
+                            <li>Infringe on our or others' intellectual property rights</li>
+                            <li>Transmit harmful or disruptive code</li>
+                            <li>Interfere with the proper working of our website</li>
+                        </ul>
+                        
+                        <h3>Disclaimer of Warranties</h3>
+                        <p>Our website and services are provided "as is" without warranties of any kind, either express or implied. We do not warrant that our website will be uninterrupted or error-free.</p>
+                        
+                        <h3>Limitation of Liability</h3>
+                        <p>To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, or consequential damages arising from your use of our website or services.</p>
+                        
+                        <h3>Indemnification</h3>
+                        <p>You agree to indemnify and hold us harmless from any claims arising from your violation of these Terms or your use of our website.</p>
+                        
+                        <h3>Termination</h3>
+                        <p>We may terminate or suspend your access to our website at any time, without notice, for any reason.</p>
+                        
+                        <h3>Governing Law</h3>
+                        <p>These Terms shall be governed by the laws of the State of Delaware, without regard to its conflict of law provisions.</p>
+                        
+                        <h3>Changes to Terms</h3>
+                        <p>We may modify these Terms at any time. Your continued use of our website constitutes acceptance of the modified Terms.</p>
+                        
+                        <h3>Contact Us</h3>
+                        <p>For questions about these Terms, please contact us at legal@shopeasy.com.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>ShopEasy</h3>
+                    <p>Your one-stop shop for all your needs. We provide quality products at affordable prices with excellent customer service.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/categories">Categories</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="/faq">FAQs</a></li>
+                        <li><a href="/shipping">Shipping Policy</a></li>
+                        <li><a href="/returns">Returns & Refunds</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Shopping St, Retail City</p>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> info@shopeasy.com</p>
+                    <p><i class="fas fa-clock"></i> Mon-Fri: 9AM-6PM</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShopEasy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript to update cart count
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get cart count
+            fetch('/api/cart')
+                .then(response => response.json())
+                .then(cart => {
+                    updateCartCount(cart.items.length);
+                })
+                .catch(error => console.error('Error fetching cart:', error));
+        });
+        
+        // Function to update cart count
+        function updateCartCount(count) {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = count;
+            }
+        }
+    </script>
+</body>
+</html>

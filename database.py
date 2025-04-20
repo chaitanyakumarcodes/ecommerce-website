@@ -2,6 +2,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 
@@ -115,6 +116,18 @@ def initialize_db():
     # Check if there's data already
     if Category.query.first() is not None:
         return
+    
+    # Add dummy user
+    dummy_user = User(
+        name='Test User',
+        email='test@example.com',
+        password='test123',
+        address='123 Main Street',
+        city='Testville',
+        state='Testland',
+        zipcode='123456'
+    )
+    db.session.add(dummy_user)
     
     # Add categories
     categories = [
