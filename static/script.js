@@ -7,6 +7,7 @@ const cartCount = document.getElementById('cart-count');
 
 // API URLs
 const API_URL = {
+    BASE: 'http://localhost:5000',
     CATEGORIES: '/api/categories',
     PRODUCTS: '/api/products',
     CART: '/api/cart'
@@ -116,9 +117,9 @@ function renderProducts(products) {
 }
 
 // Add product to cart
-async function addToCart(productId, quantity) {
+async function addToCart(productId, quantity = 1) {
     try {
-        const response = await fetch(API_URL.CART, {
+        const response = await fetch(`${API_URL.BASE}${API_URL.CART}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -127,54 +128,155 @@ async function addToCart(productId, quantity) {
                 product_id: productId,
                 quantity: quantity
             }),
+            credentials: 'include' // Important for cookies
         });
-        
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const result = await response.json();
         
         if (result.success) {
             updateCartCount();
             showNotification('Product added to cart!', 'success');
+            return true;
         } else {
-            showNotification('Failed to add product to cart.', 'error');
+            showNotification(result.error || 'Failed to add product to cart', 'error');
+            return false;
         }
     } catch (error) {
-        console.error('Error adding to cart:', error);
-        showNotification('Error adding product to cart.', 'error');
+        console.error('Cart service error:', error);
+        
+        // Fallback to localStorage if API fails
+        const localCart = JSON.parse(localStorage.getItem('cart')) || { items: [] };
+        const existingItem = localCart.items.find(item => item.product_id === productId);
+        
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            localCart.items.push({ product_id: productId, quantity });
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(localCart));
+        updateCartCount();
+        showNotification('Added to local cart (offline mode)', 'info');
+        return false;
+    }
+}
+
+// Local storage fallback for cart
+function addToCartLocalFallback(productId, quantity) {
+    try {
+        let cart = JSON.parse(localStorage.getItem('cart')) || { items: [] };
+        
+        // Find if product already exists in cart
+        const existingItem = cart.items.find(item => item.product_id === productId);
+        
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.items.push({ product_id: productId, quantity });
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        showNotification('Product added to local cart', 'success');
+        return true;
+    } catch (error) {
+        console.error('Local cart fallback error:', error);
+        showNotification('Failed to save cart locally', 'error');
+        return false;
     }
 }
 
 // Update cart count
 async function updateCartCount() {
     try {
-        const response = await fetch(API_URL.CART);
-        const cart = await response.json();
+        const response = await fetch(`${API_URL.BASE}${API_URL.CART}`, {
+            credentials: 'include'
+        });
         
-        let count = 0;
-        if (cart.items) {
-            count = cart.items.reduce((total, item) => total + item.quantity, 0);
+        if (response.ok) {
+            const result = await response.json();
+            const count = result.cart.items.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('cart-count').textContent = count;
+            return;
         }
         
-        cartCount.textContent = count;
+        // Fallback to local storage
+        const localCart = JSON.parse(localStorage.getItem('cart')) || { items: [] };
+        const count = localCart.items.reduce((total, item) => total + item.quantity, 0);
+        document.getElementById('cart-count').textContent = count;
     } catch (error) {
         console.error('Error updating cart count:', error);
+        document.getElementById('cart-count').textContent = '0';
+    }
+}
+
+async function toggleWishlist(productId, button) {
+    try {
+        const response = await fetch('/api/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+            },
+            body: JSON.stringify({ product_id: productId })
+        });
+
+        if (!response.ok) throw new Error('Wishlist service error');
+
+        const result = await response.json();
+        
+        if (result.success) {
+            const icon = button.querySelector('i');
+            if (result.action === 'added') {
+                icon.classList.replace('far', 'fas');
+                showNotification('Added to wishlist!', 'success');
+            } else {
+                icon.classList.replace('fas', 'far');
+                showNotification('Removed from wishlist', 'info');
+            }
+        }
+    } catch (error) {
+        console.error('Wishlist error:', error);
+        showNotification('Please login to use wishlist', 'error');
     }
 }
 
 // Show notification
-function showNotification(message, type) {
+function showNotification(message, type = 'info', duration = 3000) {
+    // Remove existing notifications
+    document.querySelectorAll('.notification').forEach(el => el.remove());
+
     const notification = document.createElement('div');
-    notification.classList.add('notification', `notification-${type}`);
-    notification.textContent = message;
+    notification.className = `notification notification-${type}`;
     
+    notification.innerHTML = `
+        <div class="notification-icon">
+            ${type === 'success' ? '✓' : 
+              type === 'error' ? '✗' : 
+              type === 'warning' ? '⚠' : 'i'}
+        </div>
+        <div class="notification-content">${message}</div>
+        <button class="notification-close">&times;</button>
+    `;
+
     document.body.appendChild(notification);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
+
+    // Auto-remove after duration
+    const timer = setTimeout(() => {
         notification.classList.add('hide');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 500);
-    }, 3000);
+        setTimeout(() => notification.remove(), 300);
+    }, duration);
+
+    // Manual close
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        clearTimeout(timer);
+        notification.classList.add('hide');
+        setTimeout(() => notification.remove(), 300);
+    });
 }
 
 // Product detail page quantity selector
@@ -563,37 +665,146 @@ async function addToCart(productId, quantity) {
 }
 
 // Update cart count
-async function updateCartCount() {
-    try {
-        const response = await fetch(API_URL.CART);
-        const cart = await response.json();
+function updateCartCount(count) {
+    console.log('Updating cart count to:', count); // Debugging
+    
+    const cartCountElement = document.getElementById('cart-count');
+    
+    if (cartCountElement) {
+        cartCountElement.textContent = count;
         
-        let count = 0;
-        if (cart.items) {
-            count = cart.items.reduce((total, item) => total + item.quantity, 0);
+        // Make sure the count is visible if greater than 0
+        if (count > 0) {
+            cartCountElement.style.display = 'inline-block';
+            
+            // Add a visual indication that the count changed
+            cartCountElement.classList.add('cart-count-updated');
+            setTimeout(() => {
+                cartCountElement.classList.remove('cart-count-updated');
+            }, 1000);
         }
-        
-        cartCount.textContent = count;
-    } catch (error) {
-        console.error('Error updating cart count:', error);
+    } else {
+        console.error('Cart count element not found! Check if element with id "cart-count" exists.');
+    }
+    
+    // Add style for cart count animation
+    if (!document.getElementById('cart-count-style')) {
+        const style = document.createElement('style');
+        style.id = 'cart-count-style';
+        style.innerHTML = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.2); }
+                100% { transform: scale(1); }
+            }
+            
+            .cart-count-updated {
+                animation: pulse 0.5s ease;
+            }
+        `;
+        document.head.appendChild(style);
     }
 }
 
 // Show notification
-function showNotification(message, type) {
+function showNotification(message, type = 'info') {
+    console.log('Showing notification:', message, type); // Debugging
+    
+    // Create notification element
     const notification = document.createElement('div');
-    notification.classList.add('notification', `notification-${type}`);
-    notification.textContent = message;
+    notification.classList.add('notification', type);
+    notification.innerHTML = `
+        <div class="notification-icon">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+        </div>
+        <div class="notification-message">${message}</div>
+        <button class="close-notification"><i class="fas fa-times"></i></button>
+    `;
     
-    document.body.appendChild(notification);
+    // Add notification container if it doesn't exist
+    let notificationContainer = document.querySelector('.notification-container');
+    if (!notificationContainer) {
+        notificationContainer = document.createElement('div');
+        notificationContainer.classList.add('notification-container');
+        document.body.appendChild(notificationContainer);
+        
+        // Add style for notifications with enhanced visibility
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .notification-container {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                max-width: 350px;
+            }
+            
+            .notification {
+                display: flex;
+                align-items: center;
+                background-color: white;
+                border-radius: 4px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+                padding: 15px;
+                margin-bottom: 10px;
+                animation: slideIn 0.3s ease;
+                opacity: 1;
+            }
+            
+            .notification-icon {
+                font-size: 1.2rem;
+                margin-right: 15px;
+            }
+            
+            .notification.success .notification-icon {
+                color: #27ae60;
+            }
+            
+            .notification.error .notification-icon {
+                color: #e74c3c;
+            }
+            
+            .notification.info .notification-icon {
+                color: #3498db;
+            }
+            
+            .notification-message {
+                flex: 1;
+            }
+            
+            .close-notification {
+                background: none;
+                border: none;
+                font-size: 0.9rem;
+                cursor: pointer;
+                color: #7f8c8d;
+            }
+            
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
     
-    // Auto remove after 3 seconds
+    // Add notification to container
+    notificationContainer.appendChild(notification);
+    
+    // Close notification on click
+    notification.querySelector('.close-notification').addEventListener('click', function() {
+        notification.remove();
+    });
+    
+    // Auto remove notification after 4 seconds
     setTimeout(() => {
-        notification.classList.add('hide');
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.5s ease';
+        
         setTimeout(() => {
-            document.body.removeChild(notification);
+            notification.remove();
         }, 500);
-    }, 3000);
+    }, 4000);
 }
 
 // Product detail page quantity selector
@@ -950,5 +1161,163 @@ document.addEventListener('DOMContentLoaded', () => {
                 showNotification('Error processing your order. Please try again.', 'error');
             }
         });
+    }
+});
+
+// Check login status and update UI
+function checkLoginStatus() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const loginBtn = document.querySelector('.login-btn');
+    const registerBtn = document.querySelector('.register-btn');
+    
+    if (currentUser && currentUser.loggedIn) {
+        // Add logged-in classes to buttons
+        if (loginBtn) {
+            loginBtn.classList.add('logged-in');
+            loginBtn.textContent = 'Logged In';
+        }
+        if (registerBtn) {
+            registerBtn.classList.add('logged-in');
+            registerBtn.textContent = 'Account Created';
+        }
+    } else {
+        // Remove logged-in classes
+        if (loginBtn) {
+            loginBtn.classList.remove('logged-in');
+            loginBtn.textContent = 'Login';
+        }
+        if (registerBtn) {
+            registerBtn.classList.remove('logged-in');
+            registerBtn.textContent = 'Register';
+        }
+    }
+}
+
+// Show login notification
+function showLoginNotification(userName) {
+    const notification = document.createElement('div');
+    notification.className = 'login-notification';
+    notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <div>
+            <strong>Welcome back, ${userName}!</strong>
+            <p>You are now logged in.</p>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        document.body.removeChild(notification);
+    }, 5000);
+}
+
+// Logout function
+function logout() {
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('loginTimestamp');
+    checkLoginStatus();
+    
+    // In a real app, you would also call your backend API to logout
+    showNotification('You have been logged out successfully');
+}
+
+// For demo purposes - simulate login
+// In a real app, this would be called after successful login
+window.login = function(username) {
+    const user = {
+        name: username || 'User',
+        email: 'user@example.com',
+        loggedIn: true
+    };
+    
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    checkLoginStatus();
+};
+
+// Initialize user menu dropdown
+function initUserMenu() {
+    const userMenuButton = document.getElementById('userMenuButton');
+    if (userMenuButton) {
+        userMenuButton.addEventListener('click', function() {
+            document.getElementById('user-menu').classList.toggle('active');
+        });
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const userMenu = document.getElementById('user-menu');
+        const userMenuButton = document.getElementById('userMenuButton');
+        
+        if (userMenu && userMenu.classList.contains('active') && 
+            !userMenu.contains(event.target) && 
+            userMenuButton && !userMenuButton.contains(event.target)) {
+            userMenu.classList.remove('active');
+        }
+    });
+    
+    // Logout button
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            logout();
+        });
+    }
+}
+
+// Call these functions when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    initUserMenu();
+});
+
+// Add this function to handle login UI updates
+function updateLoginUI(username) {
+    const guestActions = document.getElementById('guest-actions');
+    const userActions = document.getElementById('user-actions');
+    const userGreeting = document.getElementById('user-greeting');
+    
+    if (username) {
+        // User is logged in - hide guest actions, show user actions
+        if (guestActions) guestActions.style.display = 'none';
+        if (userActions) {
+            userActions.style.display = 'flex';
+            if (userGreeting) userGreeting.textContent = `Hi, ${username}`;
+        }
+        
+        // Show welcome notification
+        showLoginNotification(username);
+    } else {
+        // User is not logged in - show guest actions, hide user actions
+        if (guestActions) guestActions.style.display = 'flex';
+        if (userActions) userActions.style.display = 'none';
+    }
+}
+
+// Update the login function
+function login(username) {
+    const user = {
+        name: username || 'User',
+        email: 'user@example.com',
+        loggedIn: true
+    };
+    
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    updateLoginUI(user.name);
+}
+
+// Update the logout function
+function logout() {
+    localStorage.removeItem('currentUser');
+    updateLoginUI(null);
+    showNotification('You have been logged out successfully', 'info');
+}
+
+// Check login status on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser && currentUser.loggedIn) {
+        updateLoginUI(currentUser.name);
     }
 });

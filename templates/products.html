@@ -458,15 +458,27 @@
             background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 8px 16px;
             border-radius: var(--border-radius);
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-weight: 500;
         }
 
         .add-to-cart:hover {
             background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .add-to-cart:active {
+            transform: translateY(0);
+        }
+
+        .add-to-cart i {
+            font-size: 1rem;
         }
 
         .wishlist-btn {
@@ -1230,53 +1242,193 @@
         function updateProductsCount(count) {
             document.getElementById('products-count').textContent = count;
         }
-        
-        // Add to cart
-        function addToCart(productId) {
-            // Try multiple possible endpoints
-            const endpoints = [
-                '/api/cart/add',
-                '/cart/add',
-                '/add-to-cart',
-                '/api/add-to-cart'
-            ];
 
-            // Try each endpoint until one works
-            const tryEndpoint = (index) => {
-                if (index >= endpoints.length) {
-                    showNotification('Could not find cart service', 'error');
-                    return;
-                }
-
-                fetch(endpoints[index], {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        product_id: productId,
-                        quantity: 1
-                    }),
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Endpoint not found');
-                    return response.json();
-                })
-                .then(data => {
-                    updateCartCount(data.items.length);
-                    showNotification('Product added to cart!', 'success');
-                })
-                .catch(error => {
-                    console.log(`Tried ${endpoints[index]}, failed:`, error);
-                    tryEndpoint(index + 1); // Try next endpoint
-                });
-            };
-
-            tryEndpoint(0); // Start with first endpoint
+        function showNotification(message, type = 'info') {
+            console.log('Showing notification:', message, type); // Debugging
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.classList.add('notification', type);
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
+                </div>
+                <div class="notification-message">${message}</div>
+                <button class="close-notification"><i class="fas fa-times"></i></button>
+            `;
+            
+            // Add notification container if it doesn't exist
+            let notificationContainer = document.querySelector('.notification-container');
+            if (!notificationContainer) {
+                notificationContainer = document.createElement('div');
+                notificationContainer.classList.add('notification-container');
+                document.body.appendChild(notificationContainer);
+                
+                // Add style for notifications with enhanced visibility
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .notification-container {
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        z-index: 1000;
+                        max-width: 350px;
+                    }
+                    
+                    .notification {
+                        display: flex;
+                        align-items: center;
+                        background-color: white;
+                        border-radius: 4px;
+                        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+                        padding: 15px;
+                        margin-bottom: 10px;
+                        animation: slideIn 0.3s ease;
+                        opacity: 1;
+                    }
+                    
+                    .notification-icon {
+                        font-size: 1.2rem;
+                        margin-right: 15px;
+                    }
+                    
+                    .notification.success .notification-icon {
+                        color: #27ae60;
+                    }
+                    
+                    .notification.error .notification-icon {
+                        color: #e74c3c;
+                    }
+                    
+                    .notification.info .notification-icon {
+                        color: #3498db;
+                    }
+                    
+                    .notification-message {
+                        flex: 1;
+                    }
+                    
+                    .close-notification {
+                        background: none;
+                        border: none;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        color: #7f8c8d;
+                    }
+                    
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Add notification to container
+            notificationContainer.appendChild(notification);
+            
+            // Close notification on click
+            notification.querySelector('.close-notification').addEventListener('click', function() {
+                notification.remove();
+            });
+            
+            // Auto remove notification after 4 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 4000);
         }
 
         function updateCartCount(count) {
-            document.getElementById('cart-count').textContent = count;
+            console.log('Updating cart count to:', count); // Debugging
+            
+            const cartCountElement = document.getElementById('cart-count');
+            
+            if (cartCountElement) {
+                cartCountElement.textContent = count;
+                
+                // Make sure the count is visible if greater than 0
+                if (count > 0) {
+                    cartCountElement.style.display = 'inline-block';
+                    
+                    // Add a visual indication that the count changed
+                    cartCountElement.classList.add('cart-count-updated');
+                    setTimeout(() => {
+                        cartCountElement.classList.remove('cart-count-updated');
+                    }, 1000);
+                }
+            } else {
+                console.error('Cart count element not found! Check if element with id "cart-count" exists.');
+            }
+            
+            // Add style for cart count animation
+            if (!document.getElementById('cart-count-style')) {
+                const style = document.createElement('style');
+                style.id = 'cart-count-style';
+                style.innerHTML = `
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.2); }
+                        100% { transform: scale(1); }
+                    }
+                    
+                    .cart-count-updated {
+                        animation: pulse 0.5s ease;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Add to cart
+        // Add to cart function modified to use the correct API endpoint
+        function addToCart(productId) {
+            fetch('/api/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    product_id: productId,
+                    quantity: 1
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // After adding to cart, get updated cart information
+                return fetch('/api/cart');
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch cart');
+                }
+                return response.json();
+            })
+            .then(cart => {
+                // Make sure we're accessing the correct cart data
+                console.log('Cart response:', cart); // Debugging
+                
+                // Update cart count in the header
+                if (cart && cart.items) {
+                    updateCartCount(cart.items.length);
+                }
+                
+                // Display notification
+                showNotification('Product added to cart!', 'success');
+            })
+            .catch(error => {
+                console.error('Error with cart operation:', error);
+                showNotification('Failed to add product to cart.', 'error');
+            });
         }
         
         // Toggle wishlist
@@ -1526,7 +1678,7 @@
         
         // Add to cart with quantity
         function addToCartWithQuantity(productId, quantity) {
-            fetch('/api/cart/add', {
+            fetch('/api/cart', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1536,118 +1688,35 @@
                     quantity: quantity
                 }),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                updateCartCount(data.items.length);
+                // After adding to cart, get updated cart information
+                return fetch('/api/cart');
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch cart');
+                }
+                return response.json();
+            })
+            .then(cart => {
+                // Update cart count in the header
+                if (cart && cart.items) {
+                    updateCartCount(cart.items.length);
+                }
+                
+                // Display notification
                 showNotification('Product added to cart successfully!', 'success');
             })
             .catch(error => {
-                console.error('Error adding to cart:', error);
+                console.error('Error with cart operation:', error);
                 showNotification('Failed to add product to cart.', 'error');
             });
-        }
-        
-        // Update cart count
-        function updateCartCount(count) {
-            document.getElementById('cart-count').textContent = count;
-        }
-        
-        // Show notification
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.classList.add('notification', type);
-            notification.innerHTML = `
-                <div class="notification-icon">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-                </div>
-                <div class="notification-message">${message}</div>
-                <button class="close-notification"><i class="fas fa-times"></i></button>
-            `;
-            
-            // Add notification container if it doesn't exist
-            let notificationContainer = document.querySelector('.notification-container');
-            if (!notificationContainer) {
-                notificationContainer = document.createElement('div');
-                notificationContainer.classList.add('notification-container');
-                document.body.appendChild(notificationContainer);
-                
-                // Add style for notifications
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    .notification-container {
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        z-index: 1000;
-                        max-width: 350px;
-                    }
-                    
-                    .notification {
-                        display: flex;
-                        align-items: center;
-                        background-color: white;
-                        border-radius: var(--border-radius);
-                        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-                        padding: 15px;
-                        margin-bottom: 10px;
-                        animation: slideIn 0.3s ease, fadeOut 0.5s ease 3.5s forwards;
-                    }
-                    
-                    .notification-icon {
-                        font-size: 1.2rem;
-                        margin-right: 15px;
-                    }
-                    
-                    .notification.success .notification-icon {
-                        color: var(--secondary-color);
-                    }
-                    
-                    .notification.error .notification-icon {
-                        color: var(--danger-color);
-                    }
-                    
-                    .notification.info .notification-icon {
-                        color: var(--primary-color);
-                    }
-                    
-                    .notification-message {
-                        flex: 1;
-                    }
-                    
-                    .close-notification {
-                        background: none;
-                        border: none;
-                        font-size: 0.9rem;
-                        cursor: pointer;
-                        color: var(--text-light);
-                    }
-                    
-                    @keyframes slideIn {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                    
-                    @keyframes fadeOut {
-                        from { opacity: 1; }
-                        to { opacity: 0; visibility: hidden; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            // Add notification to container
-            notificationContainer.appendChild(notification);
-            
-            // Close notification on click
-            notification.querySelector('.close-notification').addEventListener('click', function() {
-                notification.remove();
-            });
-            
-            // Auto remove notification after 4 seconds
-            setTimeout(() => {
-                notification.remove();
-            }, 4000);
         }
     </script>
 </body>

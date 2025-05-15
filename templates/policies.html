@@ -235,6 +235,17 @@
             color: var(--text-light);
         }
 
+        /* Fixed sticky navigation styles */
+        .policy-content {
+            display: flex;
+            gap: 30px;
+        }
+
+        .policy-nav-container {
+            width: 250px;
+            position: relative;
+        }
+
         .policy-nav {
             position: sticky;
             top: 100px;
@@ -242,7 +253,11 @@
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             padding: 20px;
-            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .policy-sections {
+            flex: 1;
         }
 
         .policy-nav h3 {
@@ -365,9 +380,13 @@
                 flex-direction: column;
             }
             
+            .policy-nav-container {
+                width: 100%;
+                margin-bottom: 30px;
+            }
+            
             .policy-nav {
                 position: static;
-                margin-bottom: 40px;
             }
         }
 
@@ -440,18 +459,20 @@
 
     <section class="policies-container">
         <div class="container">
-            <div class="policy-content" style="display: flex; gap: 30px;">
-                <div class="policy-nav">
-                    <h3>Quick Navigation</h3>
-                    <ul>
-                        <li><a href="#shipping">Shipping Policy</a></li>
-                        <li><a href="#returns">Returns & Refund Policy</a></li>
-                        <li><a href="#privacy">Privacy Policy</a></li>
-                        <li><a href="#terms">Terms & Conditions</a></li>
-                    </ul>
+            <div class="policy-content">
+                <div class="policy-nav-container">
+                    <div class="policy-nav">
+                        <h3>Quick Navigation</h3>
+                        <ul>
+                            <li><a href="#shipping">Shipping Policy</a></li>
+                            <li><a href="#returns">Returns & Refund Policy</a></li>
+                            <li><a href="#privacy">Privacy Policy</a></li>
+                            <li><a href="#terms">Terms & Conditions</a></li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="policy-sections" style="flex: 1;">
+                <div class="policy-sections">
                     <!-- Shipping Policy -->
                     <div class="policy-section" id="shipping">
                         <h2>Shipping Policy</h2>

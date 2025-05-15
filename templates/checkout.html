@@ -602,6 +602,27 @@
                 transform: translateY(0);
             }
         }
+
+        /* Cash on delivery specific styles */
+        .payment-method.cod {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .payment-method.cod.active {
+            border-color: var(--accent-color);
+            background-color: rgba(243, 156, 18, 0.05);
+        }
+
+        .payment-method.cod .payment-method-logo i {
+            color: var(--accent-color);
+        }
+
+        .cod-notice {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 5px;
+            padding-left: 25px;
+        }
     </style>
 </head>
 
@@ -696,8 +717,16 @@
                             <h3>Payment Method</h3>
                             <div class="payment-methods">
                                 <div class="payment-method active">
-                                    <input type="radio" id="payment_credit" name="payment_method" value="credit_card"
-                                        checked>
+                                    <input type="radio" id="payment_cod" name="payment_method" value="cash_on_delivery"
+                                    checked>
+                                    <label for="payment_cod">Cash on Delivery</label>
+                                    <div class="payment-method-logo">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                </div>
+                                <p class="cod-notice">Pay with cash when your order is delivered</p>
+                                <div class="payment-method">
+                                    <input type="radio" id="payment_credit" name="payment_method" value="credit_card">
                                     <label for="payment_credit">Credit Card</label>
                                     <div class="payment-method-logo">
                                         <i class="fab fa-cc-visa"></i>
@@ -719,6 +748,7 @@
                                         <i class="fas fa-university"></i>
                                     </div>
                                 </div>
+                                
                             </div>
                         </div>
                     </div>

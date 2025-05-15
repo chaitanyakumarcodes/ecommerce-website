@@ -207,6 +207,19 @@ def logout():
     flash('You have been logged out successfully', 'success')
     return redirect(url_for('index'))
 
+@app.route('/api/user', methods=['GET'])
+def get_user():
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])  # Assuming User model
+        return jsonify({
+            'is_authenticated': True,
+            'user': {
+                'name': user.name,
+                'email': user.email
+            }
+        })
+    return jsonify({'is_authenticated': False})
+
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'user_id' not in session and 'cart' not in session:
@@ -412,20 +425,20 @@ def api_products():
         'total': len(products_with_category)
     })
 
-@app.route('/api/cart', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def api_cart():
+@app.route('/api/cart', methods=['GET', 'POST'])
+@app.route('/api/cart/<item_id>', methods=['PUT', 'DELETE'])
+def api_cart(item_id=None):
     if request.method == 'GET':
         cart_items = []
         subtotal = 0
         
         if 'user_id' in session:
-            # Get cart for logged in user
             user_cart = Cart.query.filter_by(user_id=session['user_id']).first()
             if user_cart:
                 db_cart_items = CartItem.query.filter_by(cart_id=user_cart.id).all()
                 for item in db_cart_items:
                     cart_items.append({
-                        'id': item.id,
+                        'id': str(item.id),  # Convert to string for consistency
                         'product_id': item.product_id,
                         'name': item.product.name,
                         'price': item.product.price,
@@ -435,12 +448,11 @@ def api_cart():
                     })
                     subtotal += item.product.price * item.quantity
         elif 'cart' in session:
-            # Get cart from session for guest
             for item_id, item_data in session['cart'].items():
                 product = Product.query.get(item_data['product_id'])
                 if product:
                     cart_items.append({
-                        'id': item_id,
+                        'id': item_id,  # UUID string
                         'product_id': product.id,
                         'name': product.name,
                         'price': product.price,
@@ -450,7 +462,6 @@ def api_cart():
                     })
                     subtotal += product.price * item_data['quantity']
         
-        # Calculate shipping, tax and total
         shipping = 10.00 if subtotal > 0 else 0
         tax = round(subtotal * 0.1, 2)
         total = subtotal + shipping + tax
@@ -461,25 +472,24 @@ def api_cart():
             'shipping': shipping,
             'tax': tax,
             'total': total
-        })
+        }), 200
     
     elif request.method == 'POST':
-        # Add item to cart
         data = request.get_json()
         product_id = data.get('product_id')
         quantity = data.get('quantity', 1)
         
-        product = Product.query.get_or_404(product_id)
+        product = Product.query.get(product_id)
+        if not product:
+            return jsonify({'success': False, 'message': 'Product not found'}), 404
         
         if 'user_id' in session:
-            # Add to database cart
             user_cart = Cart.query.filter_by(user_id=session['user_id']).first()
             if not user_cart:
                 user_cart = Cart(user_id=session['user_id'])
                 db.session.add(user_cart)
                 db.session.commit()
             
-            # Check if product already in cart
             cart_item = CartItem.query.filter_by(cart_id=user_cart.id, product_id=product_id).first()
             
             if cart_item:
@@ -488,58 +498,77 @@ def api_cart():
                 cart_item = CartItem(cart_id=user_cart.id, product_id=product_id, quantity=quantity)
                 db.session.add(cart_item)
             
-            db.session.commit()
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'success': False, 'message': 'Failed to add item to cart'}), 500
         else:
-            # Add to session cart
             if 'cart' not in session:
                 session['cart'] = {}
             
             item_id = str(uuid.uuid4())
-            
             session['cart'][item_id] = {
                 'product_id': product_id,
                 'quantity': quantity
             }
-            
             session.modified = True
         
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'item_id': item_id}), 200
     
     elif request.method == 'PUT':
-        # Update cart item quantity
+        if not item_id:
+            return jsonify({'success': False, 'message': 'Item ID is required'}), 400
+        
         data = request.get_json()
-        item_id = request.path.split('/')[-1]
         quantity = data.get('quantity')
         
-        if 'user_id' in session:
-            # Update database cart
-            cart_item = CartItem.query.get_or_404(item_id)
-            cart_item.quantity = quantity
-            db.session.commit()
-        else:
-            # Update session cart
-            if 'cart' in session and item_id in session['cart']:
-                session['cart'][item_id]['quantity'] = quantity
-                session.modified = True
+        if not quantity or quantity < 1:
+            return jsonify({'success': False, 'message': 'Invalid quantity'}), 400
         
-        return jsonify({'success': True})
+        if 'user_id' in session:
+            cart_item = CartItem.query.get(item_id)
+            if not cart_item:
+                return jsonify({'success': False, 'message': 'Cart item not found'}), 404
+            
+            cart_item.quantity = quantity
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'success': False, 'message': 'Failed to update cart item'}), 500
+        else:
+            if 'cart' not in session or item_id not in session['cart']:
+                return jsonify({'success': False, 'message': 'Cart item not found'}), 404
+            
+            session['cart'][item_id]['quantity'] = quantity
+            session.modified = True
+        
+        return jsonify({'success': True}), 200
     
     elif request.method == 'DELETE':
-        # Remove item from cart
-        item_id = request.path.split('/')[-1]
+        if not item_id:
+            return jsonify({'success': False, 'message': 'Item ID is required'}), 400
         
         if 'user_id' in session:
-            # Remove from database cart
-            cart_item = CartItem.query.get_or_404(item_id)
-            db.session.delete(cart_item)
-            db.session.commit()
+            cart_item = CartItem.query.get(item_id)
+            if not cart_item:
+                return jsonify({'success': False, 'message': 'Cart item not found'}), 404
+            
+            try:
+                db.session.delete(cart_item)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'success': False, 'message': 'Failed to remove cart item'}), 500
         else:
-            # Remove from session cart
-            if 'cart' in session and item_id in session['cart']:
-                del session['cart'][item_id]
-                session.modified = True
+            if 'cart' not in session or item_id not in session['cart']:
+                return jsonify({'success': False, 'message': 'Cart item not found'}), 404
+            
+            del session['cart'][item_id]
+            session.modified = True
         
-        return jsonify({'success': True})
+        return jsonify({'success': True}), 200
 
 # Helper function to merge guest cart with user cart
 def merge_carts(user_id, guest_cart):

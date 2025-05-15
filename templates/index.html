@@ -871,6 +871,17 @@
                 padding: 0 15px;
                 margin-top: 15px;
             }
+
+            #user-actions {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            #user-greeting {
+                font-weight: 500;
+                color: var(--dark-color);
+            }
         }
 
         /* Animation keyframes */
@@ -902,32 +913,35 @@
             </nav>
             <div class="user-actions">
                 <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
-                <!-- Login/Register buttons will be hidden when logged in -->
-                <div id="guest-actions">
+                
+                <!-- Guest actions (shown when not logged in) -->
+                <div id="guest-actions" style="display: flex; gap: 10px;">
                     <a href="/login" class="login-btn">Login</a>
                     <a href="/register" class="register-btn">Register</a>
                 </div>
-                <!-- User menu shown when logged in -->
-                <div id="user-menu" class="user-menu" style="display: none;">
-                    <button class="user-button" id="userMenuButton">
-                        <div class="user-avatar">
-                            <span id="userInitials">U</span>
+                
+                <!-- User greeting and menu (shown when logged in) -->
+                <div id="user-actions" style="display: none; align-items: center; gap: 10px;">
+                    <span id="user-greeting" style="font-weight: 500; color: var(--dark-color);">Hi, User</span>
+                    <div id="user-menu" class="user-menu">
+                        <button class="user-button" id="userMenuButton">
+                            <div class="user-avatar">
+                                <span id="userInitials">U</span>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <ul>
+                                <li><a href="/account"><i class="fas fa-user"></i> My Account</a></li>
+                                <li><a href="/orders"><i class="fas fa-box"></i> My Orders</a></li>
+                                <li><a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
+                                <div class="dropdown-divider"></div>
+                                <li><a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
                         </div>
-                        <span id="userName">User</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <ul>
-                            <li><a href="/account"><i class="fas fa-user"></i> My Account</a></li>
-                            <li><a href="/orders"><i class="fas fa-box"></i> My Orders</a></li>
-                            <li><a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
-                            <div class="dropdown-divider"></div>
-                            <li><a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
     </header>
 
     <section class="hero">
@@ -1165,392 +1179,336 @@
     </footer>
 
     <script>
+    document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
         
-        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
-            
-            const emailInput = this.querySelector('.newsletter-input');
-            const messageDiv = document.getElementById('newsletterMessage');
-            
-            // Simple email validation
-            if (!emailInput.value || !emailInput.value.includes('@')) {
-                showNewsletterMessage('Please enter a valid email address', 'error');
-                return;
-            }
-            
-            // In a real app, you would send this to your backend
-            // For now, we'll just show a success message
-            showNewsletterMessage('Thank you! You will be subscribed to our newsletter.', 'success');
-            emailInput.value = ''; // Clear the input
-            
-            // Optional: Actually send to your backend
-            // fetch('/api/newsletter', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ email: emailInput.value })
-            // })
-            // .then(response => response.json())
-            // .then(data => showNewsletterMessage(data.message, 'success'))
-            // .catch(error => showNewsletterMessage('Subscription failed. Please try again.', 'error'));
-        });
-
-        function showNewsletterMessage(message, type) {
-            const messageDiv = document.getElementById('newsletterMessage');
-            messageDiv.textContent = message;
-            messageDiv.style.display = 'block';
-            
-            // Set appropriate styling based on message type
-            if (type === 'success') {
-                messageDiv.style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
-                messageDiv.style.color = '#27ae60';
-                messageDiv.style.border = '1px solid #2ecc71';
-            } else {
-                messageDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.2)';
-                messageDiv.style.color = '#c0392b';
-                messageDiv.style.border = '1px solid #e74c3c';
-            }
-            
-            // Hide message after 5 seconds
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 5000);
+        const emailInput = this.querySelector('.newsletter-input');
+        const messageDiv = document.getElementById('newsletterMessage');
+        
+        if (!emailInput.value || !emailInput.value.includes('@')) {
+            showNewsletterMessage('Please enter a valid email address', 'error');
+            return;
         }
-        // JavaScript to populate featured categories
-        document.addEventListener('DOMContentLoaded', function() {
-            // Function to create a fallback product card
-            function createFallbackProductCard(product) {
-                return `
-                    <div class="product-card">
-                        ${product.is_new ? '<span class="product-badge">New</span>' : ''}
-                        ${product.is_sale ? '<span class="product-badge">Sale</span>' : ''}
-                        <div class="product-image">
-                            <img src="${product.image || 'https://placehold.co/300x200?text=Product'}" alt="${product.name}">
-                        </div>
-                        <div class="product-content">
-                            <h3>${product.name}</h3>
-                            <div class="product-price">$${product.price.toFixed(2)}</div>
-                            <div class="product-actions">
-                                <button class="add-to-cart" data-product-id="${product.id}">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                                </button>
-                                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Fetch featured categories
-            fetch('/api/categories?featured=true')
-                .then(response => response.json())
-                .then(categories => {
-                    const categoriesContainer = document.getElementById('featured-categories');
-                    // Clear placeholder content
-                    categoriesContainer.innerHTML = '';
-                    
-                    // Add categories to DOM
-                    categories.forEach(category => {
-                        const categoryCard = `
-                            <div class="category-card">
-                                <div class="category-image">
-                                    <img src="${category.image || '/api/placeholder/300/180'}" alt="${category.name}">
-                                </div>
-                                <div class="category-content">
-                                    <h3>${category.name}</h3>
-                                    <p>${category.description}</p>
-                                    <a href="/products?category=${category.id}" class="btn secondary-btn">Browse</a>
-                                </div>
-                            </div>
-                        `;
-                        categoriesContainer.innerHTML += categoryCard;
-                    });
-                })
-                .catch(error => console.error('Error fetching categories:', error));
-            
-            // Fetch featured products with error handling
-            fetch('/api/products?featured=true')
-                .then(response => {
-                    if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('API Response:', data); // Debug line
-                    const products = data.products; // Access the products array from the response
-                    const productsContainer = document.getElementById('featured-products');
-                    productsContainer.innerHTML = '';
-                    
-                    if (!products || products.length === 0) {
-                    productsContainer.innerHTML = '<p>No featured products available at this time.</p>';
-                    return;
-                    }
+        
+        showNewsletterMessage('Thank you! You will be subscribed to our newsletter.', 'success');
+        emailInput.value = '';
+    });
 
-                    products.forEach(product => {
-                    const productCard = `
-                        <div class="product-card">
-                        ${product.is_new ? '<span class="product-badge">New</span>' : ''}
-                        ${product.is_sale ? '<span class="product-badge">Sale</span>' : ''}
-                        <div class="product-image">
-                            <img src="${product.image || 'https://placehold.co/300x200?text=Product'}" 
-                                alt="${product.name}">
-                        </div>
-                        <div class="product-content">
-                            <h3>${product.name}</h3>
-                            <div class="product-price">$${product.price.toFixed(2)}</div>
-                            <div class="product-actions">
+    function showNewsletterMessage(message, type) {
+        const messageDiv = document.getElementById('newsletterMessage');
+        messageDiv.textContent = message;
+        messageDiv.style.display = 'block';
+        
+        if (type === 'success') {
+            messageDiv.style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
+            messageDiv.style.color = '#27ae60';
+            messageDiv.style.border = '1px solid #2ecc71';
+        } else {
+            messageDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.2)';
+            messageDiv.style.color = '#c0392b';
+            messageDiv.style.border = '1px solid #e74c3c';
+        }
+        
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        function createFallbackProductCard(product) {
+            return `
+                <div class="product-card">
+                    ${product.is_new ? '<span class="product-badge">New</span>' : ''}
+                    ${product.is_sale ? '<span class="product-badge">Sale</span>' : ''}
+                    <div class="product-image">
+                        <img src="${product.image || 'https://placehold.co/300x200?text=Product'}" alt="${product.name}">
+                    </div>
+                    <div class="product-content">
+                        <h3>${product.name}</h3>
+                        <div class="product-price">$${product.price.toFixed(2)}</div>
+                        <div class="product-actions">
                             <button class="add-to-cart" data-product-id="${product.id}">
                                 <i class="fas fa-shopping-cart"></i> Add to Cart
                             </button>
                             <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        fetch('/api/categories?featured=true')
+            .then(response => response.json())
+            .then(categories => {
+                const categoriesContainer = document.getElementById('featured-categories');
+                categoriesContainer.innerHTML = '';
+                
+                categories.forEach(category => {
+                    const categoryCard = `
+                        <div class="category-card">
+                            <div class="category-image">
+                                <img src="${category.image || '/api/placeholder/300/180'}" alt="${category.name}">
+                            </div>
+                            <div class="category-content">
+                                <h3>${category.name}</h3>
+                                <p>${category.description}</p>
+                                <a href="/products?category=${category.id}" class="btn secondary-btn">Browse</a>
                             </div>
                         </div>
+                    `;
+                    categoriesContainer.innerHTML += categoryCard;
+                });
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+        
+        fetch('/api/products?featured=true')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                const products = data.products;
+                const productsContainer = document.getElementById('featured-products');
+                productsContainer.innerHTML = '';
+                
+                if (!products || products.length === 0) {
+                    productsContainer.innerHTML = '<p>No featured products available at this time.</p>';
+                    return;
+                }
+
+                products.forEach(product => {
+                    const productCard = `
+                        <div class="product-card">
+                            ${product.is_new ? '<span class="product-badge">New</span>' : ''}
+                            ${product.is_sale ? '<span class="product-badge">Sale</span>' : ''}
+                            <div class="product-image">
+                                <img src="${product.image || 'https://placehold.co/300x200?text=Product'}" alt="${product.name}">
+                            </div>
+                            <div class="product-content">
+                                <h3>${product.name}</h3>
+                                <div class="product-price">$${product.price.toFixed(2)}</div>
+                                <div class="product-actions">
+                                    <button class="add-to-cart" data-product-id="${product.id}">
+                                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                                    </button>
+                                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                                </div>
+                            </div>
                         </div>
                     `;
                     productsContainer.innerHTML += productCard;
-                    });
+                });
 
-                    // Reattach event listeners
-                    document.querySelectorAll('.add-to-cart').forEach(button => {
+                document.querySelectorAll('.add-to-cart').forEach(button => {
                     button.addEventListener('click', function() {
                         addToCart(this.getAttribute('data-product-id'));
                     });
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching products:', error);
-                    document.getElementById('featured-products').innerHTML = `
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                document.getElementById('featured-products').innerHTML = `
                     <div class="error-message">
                         <p>Error loading products. Please refresh the page.</p>
                     </div>
-                    `;
-                });
+                `;
+            });
+        
+        fetch('/api/cart')
+            .then(response => response.json())
+            .then(cart => {
+                updateCartCount(cart.items.length);
+            })
+            .catch(error => console.error('Error fetching cart:', error));
+
+        checkLoginStatus();
+        
+        const userMenuButton = document.getElementById('userMenuButton');
+        if (userMenuButton) {
+            userMenuButton.addEventListener('click', function() {
+                document.getElementById('user-menu').classList.toggle('active');
+            });
+        }
+        
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('user-menu');
+            const userMenuButton = document.getElementById('userMenuButton');
             
-            // Get cart count
-            fetch('/api/cart')
-                .then(response => response.json())
-                .then(cart => {
-                    updateCartCount(cart.items.length);
-                })
-                .catch(error => console.error('Error fetching cart:', error));
+            if (userMenu && userMenu.classList.contains('active') && 
+                !userMenu.contains(event.target) && 
+                userMenuButton && !userMenuButton.contains(event.target)) {
+                userMenu.classList.remove('active');
+            }
         });
         
-        // Function to add product to cart
-        function addToCart(productId) {
-            fetch('/api/cart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    quantity: 1
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    // Update cart count
-                    fetch('/api/cart')
-                        .then(response => response.json())
-                        .then(cart => {
-                            updateCartCount(cart.items.length);
-                            
-                            // Show added to cart notification
-                            showNotification('Product added to cart!');
-                        });
-                }
-            })
-            .catch(error => console.error('Error adding to cart:', error));
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
         }
         
-        // Function to update cart count
-        function updateCartCount(count) {
-            document.getElementById('cart-count').textContent = count;
-        }
-        
-        // Function to show notification
-        function showNotification(message) {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `
-                <div class="notification-content">
-                    <i class="fas fa-check-circle"></i>
-                    <span>${message}</span>
-                </div>
-            `;
+        window.login = function(username) {
+            const user = {
+                name: username || 'User',
+                email: 'user@example.com',
+                loggedIn: true
+            };
             
-            // Add styles
-            notification.style.position = 'fixed';
-            notification.style.bottom = '20px';
-            notification.style.right = '20px';
-            notification.style.backgroundColor = 'var(--secondary-color)';
-            notification.style.color = 'white';
-            notification.style.padding = '12px 20px';
-            notification.style.borderRadius = 'var(--border-radius)';
-            notification.style.boxShadow = 'var(--box-shadow)';
-            notification.style.display = 'flex';
-            notification.style.alignItems = 'center';
-            notification.style.zIndex = '1000';
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            checkLoginStatus();
+        };
+    });
+
+    function addToCart(productId) {
+        fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: 1
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                fetch('/api/cart')
+                    .then(response => response.json())
+                    .then(cart => {
+                        updateCartCount(cart.items.length);
+                        showNotification('Product added to cart!');
+                    });
+            }
+        })
+        .catch(error => console.error('Error adding to cart:', error));
+    }
+
+    function updateCartCount(count) {
+        document.getElementById('cart-count').textContent = count;
+    }
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.right = '20px';
+        notification.style.backgroundColor = 'var(--secondary-color)';
+        notification.style.color = 'white';
+        notification.style.padding = '12px 20px';
+        notification.style.borderRadius = 'var(--border-radius)';
+        notification.style.boxShadow = 'var(--box-shadow)';
+        notification.style.display = 'flex';
+        notification.style.alignItems = 'center';
+        notification.style.zIndex = '1000';
+        notification.style.transform = 'translateY(20px)';
+        notification.style.opacity = '0';
+        notification.style.transition = 'all 0.3s ease';
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateY(0)';
+            notification.style.opacity = '1';
+        }, 10);
+        
+        setTimeout(() => {
             notification.style.transform = 'translateY(20px)';
             notification.style.opacity = '0';
-            notification.style.transition = 'all 0.3s ease';
-            
-            // Add to body
-            document.body.appendChild(notification);
-            
-            // Show notification
-            setTimeout(() => {
-                notification.style.transform = 'translateY(0)';
-                notification.style.opacity = '1';
-            }, 10);
-            
-            // Hide and remove notification after 3 seconds
-            setTimeout(() => {
-                notification.style.transform = 'translateY(20px)';
-                notification.style.opacity = '0';
-                
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-        
-        // Simple slider functionality for testimonials
-        let currentSlide = 0;
-        const dots = document.querySelectorAll('.dot');
-        
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                currentSlide = index;
-                updateSlider();
-            });
-        });
-        
-        function updateSlider() {
-            dots.forEach((dot, index) => {
-                if(index === currentSlide) {
-                    dot.classList.add('active');
-                } else {
-                    dot.classList.remove('active');
-                }
-            });
-            
-            // In a real scenario, you would have multiple testimonials to slide through
-            // But for now, we're just updating the active dot
-        }
-        
-        // Auto-rotate testimonials
-        setInterval(() => {
-            currentSlide = (currentSlide + 1) % dots.length;
-            updateSlider();
-        }, 5000);
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in (in a real app, this would check for auth token or session)
-            // For demo purposes, we'll use localStorage to simulate login state
-            checkLoginStatus();
-            
-            // Set up event listener for user menu dropdown
-            const userMenuButton = document.getElementById('userMenuButton');
-            if (userMenuButton) {
-                userMenuButton.addEventListener('click', function() {
-                    document.getElementById('user-menu').classList.toggle('active');
-                });
-            }
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                const userMenu = document.getElementById('user-menu');
-                const userMenuButton = document.getElementById('userMenuButton');
-                
-                if (userMenu && userMenu.classList.contains('active') && 
-                    !userMenu.contains(event.target) && 
-                    userMenuButton && !userMenuButton.contains(event.target)) {
-                    userMenu.classList.remove('active');
-                }
-            });
-            
-            // Handle logout
-            const logoutButton = document.getElementById('logoutButton');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    logout();
-                });
-            }
-            
-            // For demo purposes - adding a login function that can be triggered from console
-            window.login = function(username) {
-                const user = {
-                    name: username || 'User',
-                    email: 'user@example.com',
-                    loggedIn: true
-                };
-                
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                checkLoginStatus();
-            };
-        });
-        
-        function checkLoginStatus() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const guestActions = document.getElementById('guest-actions');
-            const userMenu = document.getElementById('user-menu');
-            
-            if (currentUser && currentUser.loggedIn) {
-                // User is logged in
-                if (guestActions) guestActions.style.display = 'none';
-                if (userMenu) {
-                    userMenu.style.display = 'block';
-                    // Set user name and initials
-                    document.getElementById('userName').textContent = currentUser.name;
-                    document.getElementById('userInitials').textContent = currentUser.name.charAt(0).toUpperCase();
-                }
-                
-                // Show welcome notification if this is a fresh login
-                const loginTimestamp = localStorage.getItem('loginTimestamp');
-                const currentTime = new Date().getTime();
-                
-                if (!loginTimestamp || (currentTime - loginTimestamp) > 5000) {
-                    showLoginNotification(currentUser.name);
-                    localStorage.setItem('loginTimestamp', currentTime);
-                }
-            } else {
-                // User is not logged in
-                if (guestActions) guestActions.style.display = 'flex';
-                if (userMenu) userMenu.style.display = 'none';
-            }
-        }
-        
-        function showLoginNotification(userName) {
-            const notification = document.createElement('div');
-            notification.className = 'login-notification';
-            notification.innerHTML = `
-                <i class="fas fa-check-circle"></i>
-                <div>
-                    <strong>Welcome back, ${userName}!</strong>
-                    <p>You are now logged in.</p>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Remove notification after animation completes (5 seconds)
             setTimeout(() => {
                 document.body.removeChild(notification);
-            }, 5000);
-        }
+            }, 300);
+        }, 3000);
+    }
+
+    let currentSlide = 0;
+    const dots = document.querySelectorAll('.dot');
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentSlide = index;
+            updateSlider();
+        });
+    });
+
+    function updateSlider() {
+        dots.forEach((dot, index) => {
+            if(index === currentSlide) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    setInterval(() => {
+        currentSlide = (currentSlide + 1) % dots.length;
+        updateSlider();
+    }, 5000);
+
+    function checkLoginStatus() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const guestActions = document.getElementById('guest-actions');
+        const userActions = document.getElementById('user-actions');
+        const userGreeting = document.getElementById('user-greeting');
+        const userInitials = document.getElementById('userInitials');
         
-        function logout() {
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('loginTimestamp');
-            checkLoginStatus();
+        if (currentUser && currentUser.loggedIn) {
+            if (guestActions) guestActions.style.display = 'none';
+            if (userActions) {
+                userActions.style.display = 'flex';
+                if (userGreeting) userGreeting.textContent = `Hi, ${currentUser.name}`;
+                if (userInitials) userInitials.textContent = currentUser.name.charAt(0).toUpperCase();
+            }
             
-            // Show logout confirmation
-            showNotification('You have been logged out successfully');
+            const loginTimestamp = localStorage.getItem('loginTimestamp');
+            const currentTime = new Date().getTime();
+            
+            if (!loginTimestamp || (currentTime - loginTimestamp) > 5000) {
+                showLoginNotification(currentUser.name);
+                localStorage.setItem('loginTimestamp', currentTime);
+            }
+        } else {
+            if (guestActions) guestActions.style.display = 'flex';
+            if (userActions) userActions.style.display = 'none';
         }
+    }
+
+    function showLoginNotification(userName) {
+        const notification = document.createElement('div');
+        notification.className = 'login-notification';
+        notification.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            <div>
+                <strong>Welcome back, ${userName}!</strong>
+                <p>You are now logged in.</p>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 5000);
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('loginTimestamp');
+        checkLoginStatus();
+        
+        showNotification('You have been logged out successfully');
+    }
     </script>
 </body>
 </html>
